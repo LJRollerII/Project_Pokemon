@@ -5,7 +5,7 @@ import urllib3
 from io import BytesIO
 
 window = tk.Tk()
-window.geometry("600x500")
+window.geometry("1000x1000")
 window.title("Pokedex")
 window.config(padx=10, pady=10)
 
@@ -32,20 +32,38 @@ pokemon_weight = tk.Label(window)
 pokemon_weight.config(font=("Arial", 20))
 pokemon_weight.pack(padx=10, pady=10)
 
-pokemon_abilities = tk.Label(window)
-pokemon_abilities.config(font=("Arial", 20))
-pokemon_abilities.pack(padx=10, pady=10)
-
 pokemon_base_stats = tk.Label(window)
 pokemon_base_stats.config(font=("Arial", 20))
 pokemon_base_stats.pack(padx=10, pady=10)
 
-pokemon_moves = tk.Label(window)
-pokemon_moves.config(font=("Arial", 20))
-pokemon_moves.pack(padx=10, pady=10)
+def load_pokemon():
+    pokemon = pypokedex.get(name=text_id_name.get(1.0, "end-1c"))
 
+    http = urllib3.PoolManager()
+    response = http.request('GET', pokemon.sprites.front.get('default'))
+    image = PIL.Image.open(BytesIO(response.data))
 
-# function
+    img = PIL.ImageTk.PhotoImage(image)
+    pokemon_image.config(image=img)
+    pokemon_image.image = img 
+
+    pokemon_information.config(text=f"{pokemon.dex} - {pokemon.name}".title())
+    pokemon_types.config(text=" - ".join(t for t in pokemon.types).title())
+    pokemon_height.config(text=f"{pokemon.height}")
+    pokemon_weight.config(text=f"{pokemon.weight}")
+    pokemon_base_stats.config(text=f"{pokemon.base_stats}")
+   
+label_id_name = tk.Label(window, text="ID or Name")
+label_id_name.config(font=("Arial", 20))
+label_id_name.pack(padx=10, pady=10)
+
+text_id_name = tk.Text(window, height=1)
+text_id_name.config(font=("Arial", 20))
+text_id_name.pack(padx=10, pady=10)
+
+btn_load = tk.Button(window, text="Load Pokemon", command=load_pokemon)
+btn_load.config(font=("Arial", 20))
+btn_load.pack(padx=10, pady=10)
 
 window.mainloop()
 
